@@ -29,22 +29,23 @@ def test_simple(model):
     input_img =  torch.from_numpy( np.transpose(img, (2,0,1)) ).contiguous().float()
     input_img = input_img.unsqueeze(0)
 
-    input_images = Variable(input_img.cuda() )
-    pred_log_depth = model.netG.forward(input_images) 
-    pred_log_depth = torch.squeeze(pred_log_depth)
+    with torch.no_grad():
+        input_images = Variable(input_img.cuda() )
+        pred_log_depth = model.netG.forward(input_images) 
+        pred_log_depth = torch.squeeze(pred_log_depth)
 
-    pred_depth = torch.exp(pred_log_depth)
+        pred_depth = torch.exp(pred_log_depth)
 
-    # visualize prediction using inverse depth, so that we don't need sky segmentation (if you want to use RGB map for visualization, \
-    # you have to run semantic segmentation to mask the sky first since the depth of sky is random from CNN)
-    pred_inv_depth = 1/pred_depth
-    pred_inv_depth = pred_inv_depth.data.cpu().numpy()
-    # you might also use percentile for better visualization
-    pred_inv_depth = pred_inv_depth/np.amax(pred_inv_depth)
+        # visualize prediction using inverse depth, so that we don't need sky segmentation (if you want to use RGB map for visualization, \
+        # you have to run semantic segmentation to mask the sky first since the depth of sky is random from CNN)
+        pred_inv_depth = 1/pred_depth
+        pred_inv_depth = pred_inv_depth.data.cpu().numpy()
+        # you might also use percentile for better visualization
+        pred_inv_depth = pred_inv_depth/np.amax(pred_inv_depth)
 
-    io.imsave('demo.png', pred_inv_depth)
-    # print(pred_inv_depth.shape)
-    sys.exit()
+        io.imsave('demo.png', pred_inv_depth)
+        # print(pred_inv_depth.shape)
+        sys.exit()
 
 
 
